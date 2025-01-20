@@ -1,12 +1,13 @@
 import Home from './components/Home.svelte';
-import GamePage from './pages/GamePage.svelte'; // Neue Seite importieren
-import ChatGPT from './components/ChatGPT.svelte'; // Neue Seite importieren
-
+import GamePage from './pages/GamePage.svelte';
+import AdventurePage from './pages/AdventurePage.svelte';
+import ChatGPT from './components/ChatGPT.svelte';
 
 const routes = {
   '/': Home,
-    '/game': GamePage, // Neue Route für die Spielseite
-  '/chat': ChatGPT // Neue Route für die ChatGPT-Seite
+  '/game': GamePage,
+  '/adventure': AdventurePage,
+  '/chat': ChatGPT
 };
 
 export default routes;

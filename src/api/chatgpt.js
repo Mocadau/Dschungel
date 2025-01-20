@@ -2,13 +2,15 @@ export async function generateScenario(context, step, selectedOption = null) {
   const prompt = `
     Erstelle ein Survival-Szenario in der Wildnis für Schritt ${step} von 10.
     Der Kontext bisher: "${context}".
-    Tiere müssen im Mittelpunkt stehen. Jedes Szenario soll mindestens ein neues Tier einführen.
+    Tiere müssen im Mittelpunkt stehen. Jedes Szenario soll mindestens ein neues gefährliches Tier einführen.
     Basierend auf der gewählten Antwort (${selectedOption}), schreibe die Geschichte sinnvoll weiter.
     Das Szenario muss realistisch, spannend und zusammenhängend sein.
 
     Gib das Szenario in folgendem JSON-Format zurück:
     {
       "scenario": "Beschreibung der Situation mit neuen Tieren.",
+      "dangerousAnimal": "Beschreibung des gefährlichen Tieres.",
+      "environment": "Beschreibung der Umgebung des gefährlichen Tieres.",
       "options": ["Option 1", "Option 2", "Option 3", "Option 4"],
       "correctOptions": [1, 2, 3],
       "failureMessage": "Nachricht bei falscher Wahl.",

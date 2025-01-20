@@ -18,6 +18,8 @@
     "dotenv": "^16.4.7",
     "express": "^4.21.2",
     "openai": "^4.78.1",
-    "svelte-spa-router": "^4.0.1"
+    "svelte-routing": "^2.13.0",
+    "svelte-spa-router": "^4.0.1",
+    "three": "^0.172.0"
   }
 }

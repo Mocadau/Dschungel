@@ -2,8 +2,10 @@
   import { generateScenario } from "../api/chatgpt.js";
   import { gameProgress, gameState } from "../store.js";
   import { onDestroy } from "svelte";
+  import { navigate } from "svelte-routing";
 
   let scenario = null; // Aktuelles Szenario
+  let imageURL = ""; // URL des generierten Bildes
   let loading = false;
 
   let unsubscribeState, unsubscribeProgress;
@@ -29,43 +31,105 @@
 
   async function loadScenario() {
     loading = true;
+    console.log(`Lade Szenario für Schritt ${currentStep}...`);
+
     try {
       scenario = await generateScenario(context, currentStep);
-      console.log("Szenario geladen:", scenario); // Debugging
+      console.log("Szenario erfolgreich geladen:", scenario);
+
+      // Bild generieren
+      console.log("Bildgenerierung ist aktiviert. Erzeuge Bild...");
+      const imagePrompt = `Create a small, realistic image of the following dangerous animal and its environment: ${scenario.dangerousAnimal} in ${scenario.environment}`;
+      const imageResponse = await fetch("http://localhost:3000/api/generate-image", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ prompt: imagePrompt }),
+      });
+
+      if (!imageResponse.ok) {
+        throw new Error(`Fehler bei der Bildgenerierung: ${imageResponse.statusText}`);
+      }
+
+      const imageData = await imageResponse.json();
+      imageURL = imageData.url || "";
+      console.log("Bild erfolgreich generiert:", imageURL);
     } catch (error) {
-      console.error("Fehler beim Laden des Szenarios:", error);
+      console.error("Fehler beim Laden des Szenarios oder Bildes:", error);
     } finally {
       loading = false;
     }
   }
 
- function chooseOption(index) {
-  if (!scenario.correctOptions.includes(index + 1)) {
-    gameState.update((state) => ({ ...state, gameOver: true }));
-  } else {
-    // Kontext basierend auf der gewählten Option
-    const newContext = scenario.nextStep[`contextForOption${index + 1}`];
-
-    // Fortschritt und Kontext aktualisieren
-    gameState.update((state) => ({
-      ...state,
-      currentStep: state.currentStep + 1,
-      context: `${state.context} ${newContext}`,
-    }));
-
-    // Nächstes Szenario laden
-    if (currentStep < 10) {
-      loadScenario();
+  function chooseOption(index) {
+    if (!scenario.correctOptions.includes(index + 1)) {
+      console.log("Falsche Option gewählt:", index + 1);
+      gameState.update((state) => ({ ...state, gameOver: true }));
+      navigate("/end");
     } else {
-      alert("Du hast das Abenteuer erfolgreich abgeschlossen!");
+      console.log("Richtige Option gewählt:", index + 1);
+      const newContext = scenario.nextStep[`contextForOption${index + 1}`];
+
+      // Fortschritt und Kontext aktualisieren
+      gameState.update((state) => ({
+        ...state,
+        currentStep: state.currentStep + 1,
+        context: `${state.context} ${newContext}`,
+      }));
+
+      gameProgress.update((progress) => [...progress, scenario.scenario]);
+
+      // Nächstes Szenario laden
+      if (currentStep < 10) {
+        loadScenario();
+      } else {
+        console.log("Abenteuer erfolgreich abgeschlossen!");
+        alert("Du hast das Abenteuer erfolgreich abgeschlossen!");
+        navigate("/end");
+      }
     }
   }
-}
 
   $: if (currentStep === 1 && !scenario) {
     loadScenario();
   }
 </script>
+
+<style>
+  .image-container {
+    width: 256px;
+    height: 256px;
+    margin: 1rem auto;
+    border: 1px solid #ccc;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: #f0f0f0;
+  }
+
+  .options {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 1rem;
+    margin-top: 1rem;
+  }
+
+  button {
+    padding: 0.5rem 1rem;
+    font-size: 1rem;
+    background-color: #4caf50;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+  }
+
+  button:hover {
+    background-color: #45a049;
+  }
+</style>
+
+<a href="http://localhost:5173/#/">Zur Home-Seite</a>
 
 {#if gameOver}
   <h1>Spiel vorbei</h1>
@@ -78,6 +142,17 @@
     {#if scenario}
       <h1>Schritt {currentStep} von 10</h1>
       <p>{scenario.scenario}</p>
+
+      <!-- Bild oder Platzhalter anzeigen -->
+      <div class="image-container">
+        {#if imageURL}
+          <img src={imageURL} alt="Szenario-Bild" style="max-width: 100%; max-height: 100%;" />
+        {:else}
+          <p>Kein Bild verfügbar</p>
+        {/if}
+      </div>
+
+      <!-- Antwort-Buttons -->
       <div class="options">
         {#each scenario.options as option, i}
           <button on:click={() => chooseOption(i)}>{option}</button>

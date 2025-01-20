@@ -3,11 +3,13 @@
   import LandingPage from "./pages/LandingPage.svelte";
   import AdventurePage from "./pages/AdventurePage.svelte";
   import EndPage from "./pages/EndPage.svelte";
+  import HistoryPage from "./pages/HistoryPage.svelte";
 
   const routes = {
     "/": LandingPage, // Startseite
     "/adventure": AdventurePage, // Abenteuerseite
     "/end": EndPage, // Endseite
+    "/history": HistoryPage, // Geschichte
   };
 </script>
 
@@ -16,8 +18,7 @@
     <h1>Dschungel-Abenteuer</h1>
     <div class="links">
       <a href="#/">Startseite</a>
-      <a href="#/adventure">Abenteuer</a>
-      <a href="#/end">Ende</a>
+      <a href="#/history">Geschichte</a>
     </div>
   </nav>
 </header>

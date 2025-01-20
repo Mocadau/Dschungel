@@ -1,36 +1,19 @@
 <script>
-  let playerName = '';
-
-  function startAdventure() {
-    if (playerName.trim()) {
-      // Navigiere zur neuen Seite mit dem Spielernamen
-      window.location.href = `/game?name=${encodeURIComponent(playerName)}`;
-    }
-  }
+  let container;
 </script>
 
-<h1>Willkommen im Dschungel-Abenteuer!</h1>
-<p>Bitte gib deinen Namen ein, bevor du startest:</p>
-
-<input type="text" bind:value={playerName} placeholder="Dein Name" />
-<button on:click={startAdventure} disabled={!playerName.trim()}>Abenteuer starten</button>
-
 <style>
-  input {
-    padding: 0.5rem;
-    margin: 1rem 0;
-    display: block;
+  :global(body) {
+    margin: 0;
+    overflow: hidden;
   }
-  button {
-    padding: 0.5rem 1rem;
-    background-color: #2e7d32;
-    color: white;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-  }
-  button:disabled {
-    background-color: grey;
-    cursor: not-allowed;
+
+  div {
+    width: 100vw;
+    height: 100vh;
+    background: url('/assets/your-background-image.jpg') no-repeat center center fixed;
+    background-size: cover;
   }
 </style>
+
+<div bind:this={container}></div>

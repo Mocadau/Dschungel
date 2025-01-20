@@ -1,21 +1,30 @@
 <script>
   import { gameProgress } from "../store.js";
-  import { navigate } from "svelte-routing";
 
   let progress = [];
   gameProgress.subscribe((value) => {
     progress = value;
   });
 
-  function showHistory() {
-    navigate("/history");
+  function downloadHistory() {
+    const element = document.createElement("a");
+    const file = new Blob([progress.map(step => step.scenario).join("\n\n")], { type: 'text/plain' });
+    element.href = URL.createObjectURL(file);
+    element.download = "geschichte.txt";
+    document.body.appendChild(element);
+    element.click();
   }
 </script>
 
-<h1>Herzlichen Glückwunsch! Du hast das Abenteuer abgeschlossen.</h1>
-<p>Vielen Dank fürs Spielen!</p>
+<h1>Deine Geschichte</h1>
 
-<button on:click={showHistory}>Geschichte anzeigen</button>
+<div>
+  {#each progress as step}
+    <p>{step.scenario}</p>
+  {/each}
+</div>
+
+<button on:click={downloadHistory}>Geschichte herunterladen</button>
 
 <a href="#/">
   <button>Zurück zur Startseite</button>
