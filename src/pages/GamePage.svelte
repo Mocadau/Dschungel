@@ -1,7 +1,10 @@
 <script>
+  import { playerName } from "../store.js";
+
   // URL-Parameter abrufen
   const urlParams = new URLSearchParams(window.location.search);
-  let playerName = decodeURIComponent(urlParams.get('name') || 'Spieler');
+  let name = decodeURIComponent(urlParams.get('name') || 'Spieler');
+  playerName.set(name); // Name im Store speichern
 
   // Beispieltext für die Frage
   let question = 'Welche Aktion möchtest du ausführen?';
@@ -15,7 +18,7 @@
 </script>
 
 <div class="container">
-  <h1>Willkommen im Abenteuer, {playerName}!</h1>
+  <h1>Willkommen im Abenteuer, {name}!</h1>
 
   <!-- Platzhalter-Bild -->
   <div class="image-placeholder">

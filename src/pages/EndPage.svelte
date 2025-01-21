@@ -1,48 +1,68 @@
 <script>
-  import { gameProgress } from "../store.js";
-  import { navigate } from "svelte-routing";
+  import { gameProgress, gameState } from "../store.js";
 
   let progress = [];
+  let gameOver = false;
+
   gameProgress.subscribe((value) => {
     progress = value;
   });
 
-  function showHistory() {
-    navigate("/history");
-  }
+  gameState.subscribe((state) => {
+    gameOver = state.gameOver;
+  });
 </script>
 
-<h1>Herzlichen Glückwunsch! Du hast das Abenteuer abgeschlossen.</h1>
-<p>Vielen Dank fürs Spielen!</p>
-
-<button on:click={showHistory}>Geschichte anzeigen</button>
-
-<a href="#/">
-  <button>Zurück zur Startseite</button>
-</a>
+{#if gameOver}
+  <h1>Leider hast du es nicht geschafft.</h1>
+  <p>Versuche es erneut oder lade die Geschichte herunter.</p>
+  <a href="#/">
+    <button>Zurück zur Startseite</button>
+  </a>
+{:else}
+  <h1>Herzlichen Glückwunsch! Du hast das Abenteuer abgeschlossen.</h1>
+  <p>Hier ist die Geschichte deines Abenteuers:</p>
+  <ul>
+    {#each progress as step, index}
+      <li>Schritt {index + 1}: {step}</li>
+    {/each}
+  </ul>
+  <a href="#/">
+    <button>Zurück zur Startseite</button>
+  </a>
+{/if}
 
 <style>
   h1 {
-    color: green;
     text-align: center;
-    margin-top: 2rem;
   }
+
   p {
     text-align: center;
-    font-size: 1.2rem;
-    margin: 1.5rem 0;
   }
+
+  ul {
+    margin: 2rem auto;
+    max-width: 600px;
+    list-style: none;
+    padding: 0;
+  }
+
+  li {
+    background-color: #f4f4f4;
+    margin: 0.5rem 0;
+    padding: 1rem;
+    border-radius: 4px;
+  }
+
   button {
     display: block;
-    margin: 2rem auto;
+    margin: 1rem auto;
     padding: 0.5rem 1rem;
     background-color: #2e7d32;
     color: white;
     border: none;
     border-radius: 4px;
     cursor: pointer;
-  }
-  button:hover {
-    background-color: #1b5e20;
   }
 </style>

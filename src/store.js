@@ -6,4 +6,6 @@ export const gameState = writable({
   currentStep: 1,
   context: "",
   gameOver: false,
+  gameCompleted: false,
 });
+export const playerName = writable(""); // Name des Spielers

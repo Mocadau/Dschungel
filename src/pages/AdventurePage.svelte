@@ -1,6 +1,6 @@
 <script>
   import { generateScenario } from "../api/chatgpt.js";
-  import { gameProgress, gameState } from "../store.js";
+  import { gameProgress, gameState, playerName } from "../store.js";
   import { onDestroy } from "svelte";
   import { navigate } from "svelte-routing";
 
@@ -13,11 +13,13 @@
   let context = "";
   let progress = [];
   let gameOver = false;
+  let gameCompleted = false;
 
   unsubscribeState = gameState.subscribe((state) => {
     currentStep = state.currentStep;
     context = state.context;
     gameOver = state.gameOver;
+    gameCompleted = state.gameCompleted;
   });
 
   unsubscribeProgress = gameProgress.subscribe((value) => {
@@ -37,7 +39,8 @@
       scenario = await generateScenario(context, currentStep);
       console.log("Szenario erfolgreich geladen:", scenario);
 
-      // Bild generieren
+      // Bildgenerierung auskommentiert
+      /*
       console.log("Bildgenerierung ist aktiviert. Erzeuge Bild...");
       const imagePrompt = `Create a small, realistic image of the following dangerous animal and its environment: ${scenario.dangerousAnimal} in ${scenario.environment}`;
       const imageResponse = await fetch("http://localhost:3000/api/generate-image", {
@@ -53,6 +56,7 @@
       const imageData = await imageResponse.json();
       imageURL = imageData.url || "";
       console.log("Bild erfolgreich generiert:", imageURL);
+      */
     } catch (error) {
       console.error("Fehler beim Laden des Szenarios oder Bildes:", error);
     } finally {
@@ -64,7 +68,6 @@
     if (!scenario.correctOptions.includes(index + 1)) {
       console.log("Falsche Option gewählt:", index + 1);
       gameState.update((state) => ({ ...state, gameOver: true }));
-      navigate("/end");
     } else {
       console.log("Richtige Option gewählt:", index + 1);
       const newContext = scenario.nextStep[`contextForOption${index + 1}`];
@@ -83,10 +86,18 @@
         loadScenario();
       } else {
         console.log("Abenteuer erfolgreich abgeschlossen!");
-        alert("Du hast das Abenteuer erfolgreich abgeschlossen!");
-        navigate("/end");
+        gameState.update((state) => ({ ...state, gameCompleted: true }));
       }
     }
+  }
+
+  function downloadHistory() {
+    const element = document.createElement("a");
+    const file = new Blob([progress.map(step => step.scenario).join("\n\n")], { type: 'text/plain' });
+    element.href = URL.createObjectURL(file);
+    element.download = "geschichte.txt";
+    document.body.appendChild(element);
+    element.click();
   }
 
   $: if (currentStep === 1 && !scenario) {
@@ -132,9 +143,16 @@
 <a href="http://localhost:5173/#/">Zur Home-Seite</a>
 
 {#if gameOver}
-  <h1>Spiel vorbei</h1>
-  <p>Das Abenteuer endet hier...</p>
+  <h1>Leider hast du es nicht geschafft.</h1>
+  <p>Versuche es erneut oder lade die Geschichte herunter.</p>
   <button on:click={() => location.reload()}>Neu starten</button>
+  <button on:click={downloadHistory}>Geschichte herunterladen</button>
+  <button on:click={() => navigate("/history")}>Zur Geschichte</button>
+{:else if gameCompleted}
+  <h1>Herzlichen Glückwunsch! Du hast das Abenteuer abgeschlossen.</h1>
+  <p>Hier ist die Geschichte deines Abenteuers:</p>
+  <button on:click={downloadHistory}>Geschichte herunterladen</button>
+  <button on:click={() => navigate("/history")}>Zur Geschichte</button>
 {:else}
   {#if loading}
     <p>Lädt Szenario...</p>

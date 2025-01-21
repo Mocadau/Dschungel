@@ -1,9 +1,15 @@
 <script>
-  import { gameProgress } from "../store.js";
+  import { gameProgress, playerName } from "../store.js";
 
   let progress = [];
+  let name = "";
+
   gameProgress.subscribe((value) => {
     progress = value;
+  });
+
+  playerName.subscribe((value) => {
+    name = value;
   });
 
   function downloadHistory() {
@@ -16,7 +22,7 @@
   }
 </script>
 
-<h1>Deine Geschichte</h1>
+<h1>{name}'s Dschungel-Geschichte</h1>
 
 <div>
   {#each progress as step}
@@ -39,11 +45,10 @@
   p {
     text-align: center;
     font-size: 1.2rem;
-    margin: 1.5rem 0;
   }
   button {
     display: block;
-    margin: 2rem auto;
+    margin: 1rem auto;
     padding: 0.5rem 1rem;
     background-color: #2e7d32;
     color: white;
@@ -52,6 +57,6 @@
     cursor: pointer;
   }
   button:hover {
-    background-color: #1b5e20;
+    background-color: #45a049;
   }
 </style>
