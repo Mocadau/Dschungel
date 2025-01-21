@@ -1,13 +1,14 @@
 <script>
-  import Router from "svelte-spa-router";
-  import LandingPage from "./pages/LandingPage.svelte";
-  import AdventurePage from "./pages/AdventurePage.svelte";
-  import HistoryPage from "./pages/HistoryPage.svelte";
+  import Router from 'svelte-spa-router';
+  import LandingPage from './pages/LandingPage.svelte';
+  import AdventurePage from './pages/AdventurePage.svelte';
+  import HistoryPage from './pages/HistoryPage.svelte';
 
+  // Definiere deine Routen ohne Hash
   const routes = {
-    "/": LandingPage, // Startseite
-    "/adventure": AdventurePage, // Abenteuerseite
-    "/history": HistoryPage, // Geschichte
+    '/': LandingPage,
+    '/adventure': AdventurePage,
+    '/history': HistoryPage
   };
 </script>
 
@@ -15,15 +16,16 @@
   <nav class="navbar">
     <h1>Dschungel-Abenteuer</h1>
     <div class="links">
-      <a href="#/">Startseite</a>
-      <a href="#/history">Geschichte</a>
+      <!-- Navigation mit normalen Links -->
+      <a href="/">Startseite</a>
+      <a href="/history">Geschichte</a>
     </div>
   </nav>
 </header>
 
 <main>
-  <!-- Router für Seitenwechsel -->
-  <Router {routes} />
+  <!-- WICHTIG: useHash={false} => wir nutzen "history mode", keine # in der URL -->
+  <Router {routes} useHash={false} />
 </main>
 
 <footer>
@@ -31,7 +33,6 @@
 </footer>
 
 <style>
-  /* Gesamtes Layout */
   header {
     position: fixed;
     top: 0;
@@ -44,7 +45,6 @@
     z-index: 1000;
   }
 
-  /* NavBar Styling */
   .navbar {
     display: flex;
     justify-content: space-between;
@@ -74,20 +74,17 @@
     text-decoration: underline;
   }
 
-  /* Hauptinhalt (Platz für Fixed-Header) */
   main {
-    margin-top: 60px; /* Platz für die feste Navigationsleiste */
+    margin-top: 60px;
     padding: 1rem;
   }
 
-  /* Footer */
   footer {
     text-align: center;
     margin-top: 2rem;
     font-size: 0.8rem;
   }
 
-  /* Responsives Design */
   @media (max-width: 768px) {
     .navbar h1 {
       font-size: 1.2rem;

@@ -1,40 +1,54 @@
 <script>
+  import { onDestroy } from "svelte";
+  import { push } from "svelte-spa-router";
   import { gameProgress, playerName } from "../store.js";
 
   let progress = [];
   let name = "";
 
-  gameProgress.subscribe((value) => {
+  const unsubProgress = gameProgress.subscribe((value) => {
     progress = value;
   });
 
-  playerName.subscribe((value) => {
-    name = value;
+  const unsubName = playerName.subscribe((val) => {
+    name = val;
+  });
+
+  onDestroy(() => {
+    unsubProgress();
+    unsubName();
   });
 
   function downloadHistory() {
+    let fileContent = `${name}'s Dschungel-Abenteuer\n\n`;
+    fileContent += progress.map((entry) => entry.scenario).join("\n\n");
+
+    const file = new Blob([fileContent], { type: "text/plain" });
     const element = document.createElement("a");
-    const file = new Blob([progress.map(step => step.scenario).join("\n\n")], { type: 'text/plain' });
     element.href = URL.createObjectURL(file);
     element.download = "geschichte.txt";
     document.body.appendChild(element);
     element.click();
+    document.body.removeChild(element);
+  }
+
+  function goHome() {
+    push("/");
   }
 </script>
 
 <h1>{name}'s Dschungel-Geschichte</h1>
 
-<div>
+{#if progress.length === 0}
+  <p>Noch keine Schritte unternommen.</p>
+{:else}
   {#each progress as step}
     <p>{step.scenario}</p>
   {/each}
-</div>
+{/if}
 
 <button on:click={downloadHistory}>Geschichte herunterladen</button>
-
-<a href="#/">
-  <button>Zurück zur Startseite</button>
-</a>
+<button on:click={goHome}>Zurück zur Startseite</button>
 
 <style>
   h1 {
@@ -42,10 +56,15 @@
     text-align: center;
     margin-top: 2rem;
   }
+
   p {
     text-align: center;
     font-size: 1.2rem;
+    margin: 0.5rem auto;
+    max-width: 600px;
+    line-height: 1.4;
   }
+
   button {
     display: block;
     margin: 1rem auto;
@@ -56,6 +75,7 @@
     border-radius: 4px;
     cursor: pointer;
   }
+
   button:hover {
     background-color: #45a049;
   }
